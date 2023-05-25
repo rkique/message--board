@@ -20,8 +20,8 @@
         .flex-column {
             display: flex;
             flex-direction: column;
-            max-width: 30em;
-            padding: 5em 5em;
+            max-width: 30vw;
+            padding: 5vw 5vw;
             height: 70vh;
             overflow-y: auto;
         }
@@ -49,6 +49,10 @@
         img {
             margin: 0em 0em
         }
+
+        .linked-img {
+            pointer-events: none;
+        }
     </style>
 
     <script>
@@ -65,7 +69,16 @@
         function downloadAll() {
             saveAsFile('posts.json', posts)
             links = document.getElementById('posts').querySelectorAll('a')
-            links.forEach(a => {if (a.href != window.location.href){ a.click()}})
+            links.forEach(a => { if (a.href != window.location.href) { a.click() } })
+        }
+        function urlify(text) {
+            var urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, function (url) { return '<a href="' + url + '">' + url + '</a>'; })
+        }
+
+        window.onload = () => {
+            contents = Array.from(document.getElementsByClassName('content'))
+            contents.forEach(c => { c.innerHTML = urlify(c.innerHTML) })
         }
         
     </script>
@@ -74,8 +87,8 @@
 <body>
     <div class="flex-row">
         <form enctype="multipart/form-data" method="POST">
-            <button onclick="downloadAll()">download all</button>
             <div class="flex-column">
+                <button onclick="downloadAll()">download all</button>
                 <input type="text" name="title" placeholder="post title"></input>
                 <textarea name="content" placeholder="post content" rows="9" cols="60"></textarea>
                 <input type="file" name="uploaded-file" />
@@ -87,7 +100,7 @@
             <div>
                 <p class="title"><b>{{post['title']}}</b> <i>{{post['display_time']}}</i></p>
                 <p class="content">{{post['content']}}</p>
-                <a download href="{{post['img_path']}}"><img src="{{post['img_path']}}"></a>
+                <a class="linked-img" download href="{{post['img_path']}}"><img src="{{post['img_path']}}"></a>
             </div>
             {% endfor %}
         </div>
