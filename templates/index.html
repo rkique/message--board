@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafe!</title>
+    <style>
+        html,
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        textarea {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.9em;
+        }
+
+        .flex-column {
+            display: flex;
+            flex-direction: column;
+            max-width: 30em;
+            padding: 5em 5em;
+            height: 70vh;
+            overflow-y: auto;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
+
+        .flex-column *+* {
+            margin: 1em 0em
+        }
+
+        .title {
+            color: slategray
+        }
+
+        .content {
+            color: darkslategray
+        }
+
+        .title,
+        .content,
+        img {
+            margin: 0em 0em
+        }
+    </style>
+
+    <script>
+        posts = JSON.parse(`{{posts | tojson | safe}}`)
+
+        function saveAsFile(filename, data) {
+            const blob = new Blob([JSON.stringify(data)]);
+            const link = document.createElement("a");
+            link.download = filename;
+            link.href = window.URL.createObjectURL(blob);
+            link.click()
+        };
+
+        function downloadAll() {
+            saveAsFile('posts.json', posts)
+            links = document.getElementById('posts').querySelectorAll('a')
+            links.forEach(a => {if (a.href != window.location.href){ a.click()}})
+        }
+        
+    </script>
+</head>
+
+<body>
+    <div class="flex-row">
+        <form enctype="multipart/form-data" method="POST">
+            <button onclick="downloadAll()">download all</button>
+            <div class="flex-column">
+                <input type="text" name="title" placeholder="post title"></input>
+                <textarea name="content" placeholder="post content" rows="9" cols="60"></textarea>
+                <input type="file" name="uploaded-file" />
+                <button type="submit" value="submit">submit</button>
+            </div>
+        </form>
+        <div class="flex-column" id="posts">
+            {% for post in posts %}
+            <div>
+                <p class="title"><b>{{post['title']}}</b> <i>{{post['display_time']}}</i></p>
+                <p class="content">{{post['content']}}</p>
+                <a download href="{{post['img_path']}}"><img src="{{post['img_path']}}"></a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+
+</html>
